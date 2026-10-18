@@ -1,0 +1,217 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Sylhet Medical University | Result Portal Demo</title>
+<style>
+:root{--navy:#17336f;--ink:#1c2434;--muted:#68738a;--line:#e1e5ef;--bg:#f2f4f9}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:16px Arial,Helvetica,sans-serif}
+header{background:var(--navy);color:#fff;text-align:center;padding:22px 16px}
+.logo{width:84px;height:84px;object-fit:contain;background:#fff;border-radius:50%;display:block;margin:0 auto 10px}
+h1{font-size:clamp(20px,4vw,30px);margin:0}header p{color:#dfe6ff;margin:8px 0 0}
+main{max-width:940px;margin:20px auto;padding:0 14px 40px}.card{background:#fff;border:1px solid var(--line);border-radius:12px;padding:22px;margin-bottom:16px;box-shadow:0 5px 18px #1c2e5010}
+h2{color:var(--navy);margin:0 0 14px;font-size:21px}.fields{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+label{font-weight:bold;font-size:13px;display:block;margin-bottom:6px}input{width:100%;padding:12px;border:1px solid #cbd2e1;border-radius:7px;font-size:15px;background:white}
+button{background:var(--navy);color:#fff;border:0;border-radius:7px;padding:12px 18px;font-weight:bold;margin-top:14px;cursor:pointer}
+button:disabled{opacity:.55;cursor:not-allowed}.secondary{background:#e9edf7;color:var(--navy)}.status{margin-top:12px;white-space:pre-wrap;font-size:14px;line-height:1.5}
+.small{font-size:12px;color:var(--muted);line-height:1.55}.warning{max-width:910px;margin:14px auto;padding:12px 15px;background:#fff3d1;border:1px solid #ead18b;border-radius:8px;color:#6b4c00;font-size:13px;line-height:1.5}
+.result{margin-top:18px;border:1px solid var(--line);border-radius:8px;overflow:hidden}.rhead{text-align:center;padding:18px;border-bottom:2px solid #8b7d69}.rhead h3{color:var(--navy);margin:0 0 8px}
+.meta{display:grid;grid-template-columns:1fr 1fr}.meta div{padding:11px;border-bottom:1px solid var(--line);overflow-wrap:anywhere}.meta div:nth-child(odd){font-weight:bold;background:#fafbfe}
+.excerpt{white-space:pre-wrap;overflow-wrap:anywhere;padding:15px;line-height:1.55;background:#fbfcff;font-size:14px;max-height:460px;overflow:auto}
+progress{width:100%;height:18px;margin-top:12px}footer{text-align:center;color:var(--muted);font-size:12px;padding:18px}
+hr{border:0;border-top:1px solid var(--line);margin:20px 0}
+@media(max-width:560px){.fields,.meta{grid-template-columns:1fr}.card{padding:16px}}
+</style>
+<!-- OCR libraries run in the user's browser. Internet is needed to load these libraries. -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
+</head>
+<body>
+<header>
+  <img class="logo" src="./assets/smu-logo.jpg" alt="Sylhet Medical University logo">
+  <h1>SYLHET MEDICAL UNIVERSITY</h1>
+  <p>Examination &amp; Result Portal</p>
+</header>
+<div class="warning"><b>DEMO / UNOFFICIAL PORTAL.</b> This is not an official university website. Publish real student results only with authorization. Publicly hosted JSON data can be accessed by visitors.</div>
+<main>
+<section class="card">
+  <h2>Student Result Search</h2>
+  <p class="small">Enter the session and complete registration number exactly as shown on the official record.</p>
+  <div class="fields">
+    <div><label for="session">Session</label><input id="session" placeholder="e.g. 2020-2021" autocomplete="off"></div>
+    <div><label for="reg">Registration Number</label><input id="reg" placeholder="Complete registration number" autocomplete="off"></div>
+  </div>
+  <button id="searchBtn">Search Result</button>
+  <div id="searchStatus" class="status" role="status"></div>
+  <div id="resultArea"></div>
+</section>
+
+<section class="card">
+  <h2>Admin — Create OCR index from scanned PDF</h2>
+  <p class="small">Free workflow: PDF processing happens in this browser. The PDF is not uploaded. After OCR, download <b>results.json</b> and manually replace <code>data/results.json</code> in your GitHub repository. This page has no admin login; do not leave this section exposed if that is a concern.</p>
+  <div class="fields">
+    <div><label for="exam">Examination</label><input id="exam" value="MBBS Professional Examination"></div>
+    <div><label for="upSession">Session</label><input id="upSession" placeholder="e.g. 2020-2021"></div>
+    <div><label for="year">Exam year</label><input id="year" placeholder="e.g. 2026" inputmode="numeric"></div>
+    <div><label for="pdf">Scanned PDF (max 20 MB, 30 pages)</label><input id="pdf" type="file" accept="application/pdf,.pdf"></div>
+  </div>
+  <button id="ocrBtn">Run OCR &amp; Build JSON</button>
+  <button id="downloadBtn" class="secondary" disabled>Download results.json</button>
+  <progress id="progress" max="100" value="0" hidden></progress>
+  <div id="ocrStatus" class="status" role="status"></div>
+  <p class="small">OCR may misread digits or rearrange table columns. Test with a non-sensitive sample first. Confirm every result against the original PDF before publishing.</p>
+</section>
+<section class="card">
+  <h2>Publish the OCR index on GitHub Pages</h2>
+  <ol>
+    <li>Run OCR above, then tap <b>Download results.json</b>.</li>
+    <li>Open your GitHub repository and open the <code>data</code> folder.</li>
+    <li>Choose <b>Add file → Upload files</b> and upload the downloaded <code>results.json</code>, replacing the old file. Commit the change.</li>
+    <li>Wait a minute or two, then test the student search page.</li>
+  </ol>
+  <p class="small">If your repository does not have a <code>data</code> folder, create it first. Keep the filename exactly <code>results.json</code>.</p>
+</section>
+</main>
+<footer>SMU Result Portal Demo · Not affiliated with or endorsed by Sylhet Medical University</footer>
+
+<script>
+if (window.pdfjsLib) {
+  pdfjsLib.GlobalWorkerOptions.workerSrc = "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
+}
+const INDEX_URL = "./data/results.json";
+let generatedIndex = null;
+let ocrBusy = false;
+
+function normalize(s) {
+  return String(s || "").toLowerCase().normalize("NFKC").replace(/\s+/g, " ").trim();
+}
+function normalizeReg(s) {
+  // Keep letters and digits; remove separators so OCR whitespace/hyphen differences are less disruptive.
+  return String(s || "").toUpperCase().normalize("NFKC").replace(/[^A-Z0-9]/g, "");
+}
+function escapeHtml(s) {
+  return String(s).replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+}
+function snippetAround(text, reg) {
+  const raw = String(text || "");
+  const target = normalizeReg(reg);
+  if (!target) return raw.slice(0, 1800);
+  // Search the normalized stream while mapping normalized characters to original offsets.
+  let normalized = "", positions = [];
+  for (let i=0;i<raw.length;i++) {
+    const ch = raw[i].toUpperCase();
+    if (/[A-Z0-9]/.test(ch)) { normalized += ch; positions.push(i); }
+  }
+  const at = normalized.indexOf(target);
+  if (at < 0) return raw.slice(0, 1200);
+  const start = Math.max(0, positions[at] - 450);
+  const end = Math.min(raw.length, positions[Math.min(positions.length-1, at+target.length-1)] + 650);
+  return raw.slice(start, end);
+}
+async function loadIndex() {
+  const res = await fetch(INDEX_URL + "?v=" + Date.now(), {cache:"no-store"});
+  if (!res.ok) throw new Error("Cannot load data/results.json (HTTP " + res.status + "). Make sure the file exists in your GitHub repository.");
+  const data = await res.json();
+  if (!Array.isArray(data)) throw new Error("results.json must contain a JSON array.");
+  return data;
+}
+document.getElementById("searchBtn").addEventListener("click", async () => {
+  const session = document.getElementById("session").value.trim();
+  const reg = document.getElementById("reg").value.trim();
+  const status = document.getElementById("searchStatus");
+  const area = document.getElementById("resultArea");
+  area.innerHTML = "";
+  if (!session || !reg) { status.textContent = "Please enter both session and registration number."; return; }
+  status.textContent = "Loading result index…";
+  try {
+    const records = await loadIndex();
+    const wantedSession = normalize(session);
+    const wantedReg = normalizeReg(reg);
+    const matches = records.filter(r => normalize(r.session) === wantedSession &&
+      normalizeReg(r.text || "").includes(wantedReg));
+    if (!matches.length) {
+      status.textContent = "No matching result was found. Check the session and registration number, or ask the admin to verify the OCR index.";
+      return;
+    }
+    status.textContent = "Found " + matches.length + " matching OCR record(s). Please verify the displayed text against the official record.";
+    area.innerHTML = matches.map(r => {
+      const snippet = snippetAround(r.text || "", reg);
+      return `<div class="result"><div class="rhead"><h3>${escapeHtml(r.exam || "Examination Result")}</h3><div>Sylhet Medical University · Result Search Demo</div></div>
+      <div class="meta"><div>Session</div><div>${escapeHtml(r.session || "—")}</div><div>Exam year</div><div>${escapeHtml(r.year || "—")}</div><div>Registration searched</div><div>${escapeHtml(reg)}</div><div>Source file</div><div>${escapeHtml(r.sourceName || "OCR index")}</div></div>
+      <div class="excerpt">${escapeHtml(snippet)}</div></div>`;
+    }).join("");
+  } catch (e) { status.textContent = "Error: " + e.message; }
+});
+
+document.getElementById("ocrBtn").addEventListener("click", async () => {
+  if (ocrBusy) return;
+  const file = document.getElementById("pdf").files[0];
+  const session = document.getElementById("upSession").value.trim();
+  const exam = document.getElementById("exam").value.trim();
+  const year = document.getElementById("year").value.trim();
+  const status = document.getElementById("ocrStatus");
+  const progress = document.getElementById("progress");
+  const btn = document.getElementById("ocrBtn");
+  const downloadBtn = document.getElementById("downloadBtn");
+  generatedIndex = null; downloadBtn.disabled = true;
+  if (!window.pdfjsLib || !window.Tesseract) { status.textContent = "OCR libraries could not load. Check internet access, then reload the page."; return; }
+  if (!file || !session) { status.textContent = "Select a PDF and enter the session first."; return; }
+  if (file.size > 20 * 1024 * 1024) { status.textContent = "PDF is larger than 20 MB. Please use a smaller file."; return; }
+  if (file.type && file.type !== "application/pdf" && !file.name.toLowerCase().endsWith(".pdf")) { status.textContent = "Please select a PDF file."; return; }
+  ocrBusy = true; btn.disabled = true; progress.hidden = false; progress.value = 0;
+  status.textContent = "Reading PDF…";
+  let worker;
+  try {
+    const bytes = new Uint8Array(await file.arrayBuffer());
+    const pdf = await pdfjsLib.getDocument({data: bytes}).promise;
+    if (pdf.numPages > 30) throw new Error("PDF has " + pdf.numPages + " pages. This demo limit is 30 pages; split it into smaller PDFs.");
+    worker = await Tesseract.createWorker("eng", 1, {
+      logger: m => {
+        if (m.status === "recognizing text") {
+          const pct = Math.round((m.progress || 0) * 100);
+          status.textContent = "OCR is running… " + pct + "% of current page";
+        }
+      }
+    });
+    const pageTexts = [];
+    for (let p=1; p<=pdf.numPages; p++) {
+      status.textContent = "Rendering page " + p + " of " + pdf.numPages + "…";
+      const page = await pdf.getPage(p);
+      const viewport = page.getViewport({scale: 1.8});
+      const canvas = document.createElement("canvas");
+      const ctx = canvas.getContext("2d", {willReadFrequently:true});
+      canvas.width = Math.ceil(viewport.width); canvas.height = Math.ceil(viewport.height);
+      await page.render({canvasContext:ctx, viewport}).promise;
+      status.textContent = "Reading text on page " + p + " of " + pdf.numPages + "…";
+      const result = await worker.recognize(canvas);
+      pageTexts.push("\n\n--- PAGE " + p + " ---\n" + (result.data.text || ""));
+      progress.value = Math.round(p / pdf.numPages * 100);
+      canvas.width = 1; canvas.height = 1;
+    }
+    generatedIndex = await loadIndex().catch(() => []);
+    generatedIndex = generatedIndex.filter(r => !(normalize(r.session) === normalize(session) && normalize(r.sourceName) === normalize(file.name)));
+    generatedIndex.push({
+      session, exam, year, sourceName: file.name,
+      createdAt: new Date().toISOString(),
+      text: pageTexts.join("\n")
+    });
+    status.textContent = "OCR finished. " + pdf.numPages + " page(s) processed. Download the JSON, check the extracted text carefully, and replace data/results.json on GitHub.";
+    downloadBtn.disabled = false;
+  } catch (e) {
+    status.textContent = "OCR failed: " + (e && e.message ? e.message : String(e));
+  } finally {
+    if (worker) { try { await worker.terminate(); } catch (_) {} }
+    ocrBusy = false; btn.disabled = false;
+  }
+});
+document.getElementById("downloadBtn").addEventListener("click", () => {
+  if (!generatedIndex) return;
+  const blob = new Blob([JSON.stringify(generatedIndex, null, 2)], {type:"application/json"});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a"); a.href = url; a.download = "results.json";
+  document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(url);
+});
+</script>
+</body>
+</html>
