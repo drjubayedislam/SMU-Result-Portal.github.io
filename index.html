@@ -33,7 +33,6 @@ hr{border:0;border-top:1px solid var(--line);margin:20px 0}
   <h1>SYLHET MEDICAL UNIVERSITY</h1>
   <p>Examination &amp; Result Portal</p>
 </header>
-<div class="warning"><b>DEMO / UNOFFICIAL PORTAL.</b> This is not an official university website. Publish real student results only with authorization. Publicly hosted JSON data can be accessed by visitors.</div>
 <main>
 <section class="card">
   <h2>Student Result Search</h2>
@@ -61,19 +60,9 @@ hr{border:0;border-top:1px solid var(--line);margin:20px 0}
   <progress id="progress" max="100" value="0" hidden></progress>
   <div id="ocrStatus" class="status" role="status"></div>
   <p class="small">OCR may misread digits or rearrange table columns. Test with a non-sensitive sample first. Confirm every result against the original PDF before publishing.</p>
-</section>
-<section class="card">
-  <h2>Publish the OCR index on GitHub Pages</h2>
-  <ol>
-    <li>Run OCR above, then tap <b>Download results.json</b>.</li>
-    <li>Open your GitHub repository and open the <code>data</code> folder.</li>
-    <li>Choose <b>Add file → Upload files</b> and upload the downloaded <code>results.json</code>, replacing the old file. Commit the change.</li>
-    <li>Wait a minute or two, then test the student search page.</li>
-  </ol>
-  <p class="small">If your repository does not have a <code>data</code> folder, create it first. Keep the filename exactly <code>results.json</code>.</p>
-</section>
+  
 </main>
-<footer>SMU Result Portal Demo · Not affiliated with or endorsed by Sylhet Medical University</footer>
+<footer> SMU Result Portal </footer>
 
 <script>
 if (window.pdfjsLib) {
