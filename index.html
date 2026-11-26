@@ -339,11 +339,84 @@ td:first-child{
     page-break-inside:avoid;
   }
 }
+  .portal-header{
+    background:#1b3b70;
+    color:white;
+    text-align:center;
+    padding:15px 10px 30px;
+    border-bottom:7px solid #a69a76;
+    margin:0;
+}
+
+.portal-header img{
+    width:115px;
+    height:115px;
+    object-fit:contain;
+    background:white;
+    border-radius:50%;
+    padding:9px;
+    margin:10px auto 15px;
+    display:block;
+}
+
+.portal-header h1{
+    font-size:clamp(18px,5vw,30px);
+    font-weight:bold;
+    margin:0 0 12px;
+    color:white;
+    line-height:1.2;
+    white-space:nowrap;
+}
+
+.portal-header p{
+    font-size:clamp(16px,3vw,23px);
+    margin:0;
+    color:white;
+}
+
+.portal-warning{
+    max-width:100%;
+    margin:18px auto 25px;
+    padding:14px 18px;
+    background:#fff7d9;
+    border:1px solid #e5d49a;
+    border-radius:10px;
+    color:#66551b;
+    font-size:14px;
+    line-height:1.4;
+}
+@media(max-width:600px){
+    .portal-header{
+        padding:15px 5px 30px;
+    }
+
+    .portal-header img{
+        width:115px;
+        height:115px;
+    }
+
+    .portal-header h1{
+        font-size:clamp(17px,5vw,25px);
+        white-space:nowrap;
+    }
+
+    .portal-header p{
+        font-size:20px;
+    }
+}
 </style>
 </head>
 
 <body>
+<div class="portal-header">
+    <img src="smu-logo.jpg" alt="SMU Logo">
+    <h1>SYLHET MEDICAL UNIVERSITY</h1>
+    <p>Examination &amp; Result Portal</p>
+</div>
 
+<div class="portal-warning">
+    <strong>This is not an official university website.</strong>
+</div>
 <!-- INPUT FORM -->
 
 <div class="form-container">
